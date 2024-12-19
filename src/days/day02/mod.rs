@@ -1,3 +1,34 @@
+fn check_levels_safe(numbers: &Vec<u32>) -> bool {
+    let mut is_line_increasing: Option<bool> = None;
+    for (&prev, &current) in numbers.iter().zip(numbers.iter().skip(1)) {
+        if prev == current {
+            return false;
+        }
+
+        let prev_current_diff = prev.abs_diff(current);
+        if !(1..=3).contains(&prev_current_diff) {
+            return false;
+        }
+
+        match is_line_increasing {
+            Some(true) => {
+                if prev > current {
+                    return false;
+                }
+            }
+            Some(false) => {
+                if prev < current {
+                    return false;
+                }
+            }
+            None => {
+                is_line_increasing = Some(prev < current);
+            }
+        }
+    }
+    true
+}
+
 #[allow(dead_code)]
 fn part1(input: &str) -> u32 {
     let mut res = 0;
@@ -6,41 +37,8 @@ fn part1(input: &str) -> u32 {
             .split_whitespace()
             .filter_map(|s| s.parse::<u32>().ok())
             .collect();
-        let mut is_line_increasing: Option<bool> = None;
-        let mut failed = false;
-        for (prev, current) in numbers.iter().zip(numbers.iter().skip(1)) {
-            if prev == current {
-                failed = true;
-                break;
-            }
-
-            let prev_current_diff = prev.abs_diff(*current);
-            if !(1..=3).contains(&prev_current_diff) {
-                failed = true;
-                break;
-            }
-
-            match is_line_increasing {
-                Some(true) => {
-                    if prev > current {
-                        failed = true;
-                        break;
-                    }
-                }
-                Some(false) => {
-                    if prev < current {
-                        failed = true;
-                        break;
-                    }
-                }
-                None => {
-                    is_line_increasing = Some(*prev < *current);
-                }
-            }
-        }
-        if !failed {
+        if check_levels_safe(&numbers) {
             res += 1;
-            // println!("{:?}", original)
         }
     }
 
@@ -49,7 +47,21 @@ fn part1(input: &str) -> u32 {
 
 #[allow(dead_code)]
 fn part2(input: &str) -> u32 {
-    0
+    let mut res = 0;
+    for line in input.lines() {
+        let numbers: Vec<u32> = line
+            .split_whitespace()
+            .filter_map(|s| s.parse::<u32>().ok())
+            .collect();
+        for i in 0..numbers.len() {
+            if check_levels_safe(&[&numbers[..i], &numbers[i + 1..]].concat()) {
+                res += 1;
+                break;
+            }
+        }
+    }
+
+    res
 }
 
 #[cfg(test)]
@@ -66,7 +78,7 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(TEST_INPUT), 0)
+        assert_eq!(part2(TEST_INPUT), 4)
     }
 
     #[test]
@@ -74,8 +86,13 @@ mod tests {
         println!("Part 1 Output: {}", part1(REAL_INPUT))
     }
 
-    // #[test]
-    // fn real_part2() {
-    //     println!("Part 2 Output: {}", part2(REAL_INPUT))
-    // }
+    #[test]
+    fn real_test_part1() {
+        assert_eq!(part1(REAL_INPUT), 479)
+    }
+
+    #[test]
+    fn real_part2() {
+        println!("Part 2 Output: {}", part2(REAL_INPUT))
+    }
 }
