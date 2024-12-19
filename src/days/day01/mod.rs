@@ -3,26 +3,20 @@ use std::iter::zip;
 
 #[allow(dead_code)]
 fn part1(input: &str) -> u32 {
-    let mut a1: Vec<u32> = Vec::new();
-    let mut a2: Vec<u32> = Vec::new();
-    for line in input.lines() {
-        let mut line_split = line.split_whitespace();
-        a1.push(line_split.next().unwrap().parse().unwrap());
-        a2.push(line_split.next().unwrap().parse().unwrap());
-    }
+    let (mut a1, mut a2): (Vec<u32>, Vec<u32>) = input
+        .lines()
+        .map(|line| {
+            let mut parts = line.split_whitespace();
+            (
+                parts.next().unwrap().parse::<u32>().unwrap(),
+                parts.next().unwrap().parse::<u32>().unwrap(),
+            )
+        })
+        .unzip();
     a1.sort();
     a2.sort();
 
-    let mut res: u32 = 0;
-    for iter in zip(a1, a2) {
-        if iter.0 > iter.1 {
-            res += iter.0 - iter.1;
-        } else {
-            res += iter.1 - iter.0;
-        }
-    }
-
-    res
+    zip(a1, a2).map(|(n1, n2)| n1.abs_diff(n2)).sum::<u32>()
 }
 
 #[allow(dead_code)]
