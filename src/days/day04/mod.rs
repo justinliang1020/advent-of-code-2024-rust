@@ -44,10 +44,69 @@ fn part1(input: &str) -> u32 {
 
     res
 }
-
 #[allow(dead_code)]
 fn part2(input: &str) -> u32 {
-    0
+    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+    let center_letter = 'A';
+
+    let mut res = 0;
+    for r in 1..(grid.len() - 1) {
+        for c in 1..(grid[0].len() - 1) {
+            if grid[r][c] != center_letter {
+                continue;
+            }
+
+            // M.S
+            // .A.
+            // M.S
+            if grid[r - 1][c - 1] == 'M'
+                && grid[r - 1][c + 1] == 'S'
+                && grid[r + 1][c - 1] == 'M'
+                && grid[r + 1][c + 1] == 'S'
+            {
+                res += 1;
+                continue;
+            }
+
+            // S.S
+            // .A.
+            // M.M
+            if grid[r - 1][c - 1] == 'S'
+                && grid[r - 1][c + 1] == 'S'
+                && grid[r + 1][c - 1] == 'M'
+                && grid[r + 1][c + 1] == 'M'
+            {
+                res += 1;
+                continue;
+            }
+
+            // M.M
+            // .A.
+            // S.S
+            if grid[r - 1][c - 1] == 'M'
+                && grid[r - 1][c + 1] == 'M'
+                && grid[r + 1][c - 1] == 'S'
+                && grid[r + 1][c + 1] == 'S'
+            {
+                res += 1;
+                continue;
+            }
+
+            // S.M
+            // .A.
+            // S.M
+            if grid[r - 1][c - 1] == 'S'
+                && grid[r - 1][c + 1] == 'M'
+                && grid[r + 1][c - 1] == 'S'
+                && grid[r + 1][c + 1] == 'M'
+            {
+                res += 1;
+                continue;
+            }
+        }
+    }
+
+    res
 }
 
 #[cfg(test)]
@@ -64,7 +123,7 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(TEST_INPUT), 0)
+        assert_eq!(part2(TEST_INPUT), 9)
     }
 
     #[test]
@@ -72,8 +131,8 @@ mod tests {
         println!("Part 1 Output: {}", part1(REAL_INPUT))
     }
 
-    // #[test]
-    // fn real_part2() {
-    //     println!("Part 2 Output: {}", part2(REAL_INPUT))
-    // }
+    #[test]
+    fn real_part2() {
+        println!("Part 2 Output: {}", part2(REAL_INPUT))
+    }
 }
