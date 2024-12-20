@@ -1,33 +1,48 @@
-fn search_horizontal(grid: Vec<Vec<char>>, word: String) -> u32 {
-    let reversed_word = word.chars().rev().collect::<String>();
-
-    grid.iter()
-        .map(|line| {
-            let mut matches: u32 = 0;
-            for end in word.len()..line.len() {
-                let start = end - word.len();
-                let current_word = line[start..end].iter().collect::<String>();
-                if current_word == word || current_word == reversed_word {
-                    matches += 1
-                }
-            }
-            matches
-        })
-        .sum()
-}
-
-fn search_vertical(grid: Vec<Vec<char>>, word: String) -> u32 {
-    0
-}
-
-fn search_diagonal(grid: Vec<Vec<char>>, word: String) -> u32 {
-    0
-}
 #[allow(dead_code)]
 fn part1(input: &str) -> u32 {
     let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     let word = String::from("XMAS");
-    search_horizontal(grid, word)
+
+    fn inside(x: i32, y: i32, grid: &[Vec<char>]) -> bool {
+        0 <= x && x < grid.len() as i32 && 0 <= y && y < grid[0].len() as i32
+    }
+
+    let mut res = 0;
+    for r in 0..grid.len() {
+        for c in 0..grid[0].len() {
+            if grid[r][c] != word.chars().next().unwrap() {
+                continue;
+            }
+
+            for dr in -1..=1 {
+                for dc in -1..=1 {
+                    if dr == 0 && dc == 0 {
+                        continue;
+                    }
+                    let mut good = true;
+                    for i in 0..word.len() as i32 {
+                        let r2 = r as i32 + dr * i;
+                        let c2 = c as i32 + dc * i;
+                        // println!("{} {} {} {}", i, r2, c2, inside(r2, c2, &grid));
+
+                        if inside(r2, c2, &grid)
+                            && grid[r2 as usize][c2 as usize]
+                                == word.chars().nth(i as usize).unwrap()
+                        {
+                        } else {
+                            good = false;
+                            break;
+                        }
+                    }
+                    if good {
+                        res += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    res
 }
 
 #[allow(dead_code)]
@@ -44,7 +59,7 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(TEST_INPUT), 0)
+        assert_eq!(part1(TEST_INPUT), 18)
     }
 
     #[test]
@@ -52,11 +67,11 @@ mod tests {
         assert_eq!(part2(TEST_INPUT), 0)
     }
 
-    // #[test]
-    // fn real_part1() {
-    //     println!("Part 1 Output: {}", part1(REAL_INPUT))
-    // }
-    //
+    #[test]
+    fn real_part1() {
+        println!("Part 1 Output: {}", part1(REAL_INPUT))
+    }
+
     // #[test]
     // fn real_part2() {
     //     println!("Part 2 Output: {}", part2(REAL_INPUT))
