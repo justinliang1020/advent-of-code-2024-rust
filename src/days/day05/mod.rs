@@ -1,7 +1,7 @@
 // template code for each dayXX/mod.rs file
 //
 
-use std::collections::HashMap;
+use std::{collections::HashMap, task::Wake};
 
 fn parse_input(input: &str) -> (HashMap<u32, Vec<u32>>, Vec<&str>) {
     let mut map: HashMap<u32, Vec<u32>> = HashMap::new();
@@ -27,13 +27,37 @@ fn part1(input: &str) -> u32 {
     let (map, lines) = parse_input(input);
 
     println!("{:?} {:?}", map, lines);
+    let mut res = 0;
 
+    for line in lines {
+        let l: Vec<&str> = line.split(",").collect();
+
+        let mut correct = true;
+        for i in 0..l.len() {
+            if !correct {
+                break;
+            }
+            for j in i + 1..l.len() {
+                if let Some(v) = map.get(&l[i].parse::<u32>().unwrap()) {
+                    if !v.contains(&l[j].parse::<u32>().unwrap()) {
+                        correct = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if correct {
+            println!("{:?}", l);
+            res += l[l.len() / 2].parse::<u32>().unwrap();
+        }
+    }
+
+    res
     // for each line, iterate through each number
     // for each number, iterate through the rest of the list and check if that pair is in the hashmap
     // if any fail, break out of iteration and don't include that as success
     // if no failures, add the middle element of the array to res
-
-    0
 }
 
 #[allow(dead_code)]
@@ -50,7 +74,7 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(TEST_INPUT), 0)
+        assert_eq!(part1(TEST_INPUT), 143)
     }
 
     #[test]
