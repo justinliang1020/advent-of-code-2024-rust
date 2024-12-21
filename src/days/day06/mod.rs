@@ -1,5 +1,6 @@
 // template code for each dayXX/mod.rs file
-#[derive(Debug, PartialEq, Clone)]
+use std::{collections::HashSet, hash::Hash};
+#[derive(Debug, PartialEq, Clone, Eq, Hash)]
 enum Direction {
     Up,
     Down,
@@ -18,7 +19,7 @@ impl Direction {
     }
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Eq, Hash)]
 struct State {
     dir: Direction,
     pos: (usize, usize),
@@ -131,7 +132,7 @@ fn part2(input: &str) -> u32 {
                 grid[r][c] = OBSTACLE;
             }
             let mut state = initial_state.clone();
-            let mut moves: Vec<State> = vec![];
+            let mut moves: HashSet<State> = HashSet::new();
             loop {
                 if state.pos.0 as i32 + state.dir.to_tuple().0 < 0
                     || state.pos.0 as i32 + state.dir.to_tuple().0 >= grid.len() as i32
@@ -144,7 +145,7 @@ fn part2(input: &str) -> u32 {
                     sum += 1;
                     break;
                 }
-                moves.push(state.clone());
+                moves.insert(state.clone());
                 let new_pos = (
                     (state.dir.to_tuple().0 + state.pos.0 as i32) as usize,
                     (state.dir.to_tuple().1 + state.pos.1 as i32) as usize,
